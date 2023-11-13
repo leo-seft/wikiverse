@@ -35,9 +35,7 @@ router.post("/", async (req, res, next) => {
             name: tagName
           }
         });
-        if (wasCreated) {
-          tags.push(tag);
-        }
+        tags.push(tag);
       }
       await page.addTags(tags);
     }
