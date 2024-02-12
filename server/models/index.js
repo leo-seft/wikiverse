@@ -1,7 +1,7 @@
-const {Sequelize} = require('sequelize')
-const {sequelize} = require('../db')
+const { Sequelize } = require('sequelize')
+const { sequelize } = require('../db')
 
-const Page = sequelize.define("page", {
+const Page = sequelize.define('page', {
   title: {
     type: Sequelize.STRING,
     allowNull: false
@@ -9,7 +9,7 @@ const Page = sequelize.define("page", {
   slug: {
     type: Sequelize.STRING,
     allowNull: false,
-    //since we are searching, editing, deleting by slug, these need to be unique
+    // since we are searching, editing, deleting by slug, these need to be unique
     unique: true
   },
   content: {
@@ -17,20 +17,20 @@ const Page = sequelize.define("page", {
     allowNull: false
   },
   status: {
-    type: Sequelize.ENUM("open", "closed")
+    type: Sequelize.ENUM('open', 'closed')
   }
-});
+})
 
 Page.beforeValidate((page) => {
   /*
    * Generate slug
    */
   if (!page.slug) {
-    page.slug = page.title.replace(/\s/g, "_").replace(/\W/g, "").toLowerCase();
+    page.slug = page.title.replace(/\s/g, '_').replace(/\W/g, '').toLowerCase()
   }
-});
+})
 
-Page.findByTag = function(search) {
+Page.findByTag = function (search) {
   return Page.findAll({
     include: {
       model: Tag,
@@ -43,7 +43,7 @@ Page.findByTag = function(search) {
   })
 }
 
-Page.prototype.findSimilar = function(tags) {
+Page.prototype.findSimilar = function (tags) {
   return Page.findAll({
     where: {
       id: {
@@ -58,10 +58,10 @@ Page.prototype.findSimilar = function(tags) {
         }
       }
     }
-  });
+  })
 }
 
-const User = sequelize.define("user", {
+const User = sequelize.define('user', {
   name: {
     type: Sequelize.STRING,
     allowNull: false
@@ -71,25 +71,25 @@ const User = sequelize.define("user", {
     isEmail: true,
     allowNull: false
   }
-});
+})
 
-const Tag = sequelize.define("tag", {
+const Tag = sequelize.define('tag', {
   name: {
     type: Sequelize.STRING,
     allowNull: false
   }
-});
+})
 
-//This adds methods to 'Page', such as '.setAuthor'. It also creates a foreign key attribute on the Page table pointing ot the User table
-Page.belongsTo(User, { as: "author" });
-User.hasMany(Page, {foreignKey: 'authorId'});
+// This adds methods to 'Page', such as '.setAuthor'. It also creates a foreign key attribute on the Page table pointing ot the User table
+Page.belongsTo(User, { as: 'author' })
+User.hasMany(Page, { foreignKey: 'authorId' })
 
-Page.belongsToMany(Tag, {through: 'page_tags'});
-Tag.belongsToMany(Page, {through: 'page_tags'});
+Page.belongsToMany(Tag, { through: 'page_tags' })
+Tag.belongsToMany(Page, { through: 'page_tags' })
 
 module.exports = {
   db: sequelize,
   Page,
   User,
   Tag
-};
+}
