@@ -1,65 +1,65 @@
-const express = require("express");
-const router = express.Router();
-const { Page, User, Tag } = require("../models");
+/* eslint no-unused-vars: 0 */ // --> OFF
+
+const express = require('express')
+const router = express.Router()
+const { Page, User, Tag } = require('../models')
 
 // GET /wiki
-router.get("/", async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const pages = await Page.findAll();
-    res.send(pages);
+    const pages = await Page.findAll()
+    res.send(pages)
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // POST /wiki
-router.post("/", async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
     const [user, wasCreated] = await User.findOrCreate({
       where: {
         name: req.body.name,
         email: req.body.email
       }
-    });
+    })
 
-    const page = await Page.create(req.body);
+    const page = await Page.create(req.body)
 
-    await page.setAuthor(user);
+    await page.setAuthor(user)
 
-    if(req.body.tags) {
-      const tagArray = req.body.tags.split(' ');
-      const tags = [];
-      for (let tagName of tagArray) {
+    if (req.body.tags) {
+      const tagArray = req.body.tags.split(' ')
+      const tags = []
+      for (const tagName of tagArray) {
         const [tag, wasCreated] = await Tag.findOrCreate({
           where: {
             name: tagName
           }
-        });
-        if (wasCreated) {
-          tags.push(tag);
-        }
+        })
+        tags.push(tag)
       }
-      await page.addTags(tags);
+      await page.addTags(tags)
     }
 
-    res.send(page);
+    res.send(page)
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // GET /wiki/search
-router.get("/search", async (req, res, next) => {
+router.get('/search', async (req, res, next) => {
   try {
-    const pages = await Page.findByTag(req.query.search);
-    res.send(pages);
+    const pages = await Page.findByTag(req.query.search)
+    res.send(pages)
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // PUT /wiki/:slug
-router.put("/:slug", async (req, res, next) => {
+router.put('/:slug', async (req, res, next) => {
   try {
     const [user, wasCreated] = await User.findOrCreate({
       where: {
@@ -73,17 +73,17 @@ router.put("/:slug", async (req, res, next) => {
         slug: req.params.slug
       },
       returning: true
-    });
+    })
 
-    const tagArray = req.body.tags.split(' ');
+    const tagArray = req.body.tags.split(' ')
     const tags = await Promise.all(tagArray.map(async (tagName) => {
       const [tag, wasCreated] = await Tag.findOrCreate({
         where: {
           name: tagName
         }
-      });
-      return tag;
-    }));
+      })
+      return tag
+    }))
 
     const page = await Page.findOne(
       {where: {slug: req.params.slug}}
@@ -93,28 +93,28 @@ router.put("/:slug", async (req, res, next) => {
 
     res.send(page);
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // DELETE /wiki/:slug
-router.delete("/:slug", async (req, res, next) => {
+router.delete('/:slug', async (req, res, next) => {
   try {
     await Page.destroy({
       where: {
         slug: req.params.slug
       }
-    });
+    })
 
-    const pages = await Page.findAll();
-    res.send(pages);
+    const pages = await Page.findAll()
+    res.send(pages)
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // GET /wiki/:slug
-router.get("/:slug", async (req, res, next) => {
+router.get('/:slug', async (req, res, next) => {
   try {
     const page = await Page.findOne({
       where: {
@@ -129,17 +129,17 @@ router.get("/:slug", async (req, res, next) => {
           model: User,
           as: 'author'
         }
-      ],
-    });
+      ]
+    })
     if (page === null) {
-      res.status(404).send(notFoundPage());
+      res.status(404).send('Page not found')
     } else {
-      res.send(page);
+      res.send(page)
     }
   } catch (error) {
-    next(error);
+    next(error)
   }
-});
+})
 
 // GET /wiki/:slug/similar
 router.get('/:slug/similar', async (req, res, next) => {
@@ -149,13 +149,13 @@ router.get('/:slug/similar', async (req, res, next) => {
         slug: req.params.slug
       },
       include: [{ model: Tag }]
-    });
-    const tagNames = page.tags.map(tag => tag.name);
-    const similars = await page.findSimilar(tagNames);
-    res.send(similars);
+    })
+    const tagNames = page.tags.map(tag => tag.name)
+    const similars = await page.findSimilar(tagNames)
+    res.send(similars)
   } catch (error) {
-    next(error);
+    next(error)
   }
 })
 
-module.exports = router;
+module.exports = router
