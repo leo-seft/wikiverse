@@ -61,6 +61,13 @@ router.get('/search', async (req, res, next) => {
 // PUT /wiki/:slug
 router.put('/:slug', async (req, res, next) => {
   try {
+    const [user, wasCreated] = await User.findOrCreate({
+      where: {
+        name: req.body.name,
+        email: req.body.email
+      }
+    });
+
     const [updatedRowCount, updatedPages] = await Page.update(req.body, {
       where: {
         slug: req.params.slug
@@ -78,9 +85,13 @@ router.put('/:slug', async (req, res, next) => {
       return tag
     }))
 
-    await updatedPages[0].setTags(tags)
+    const page = await Page.findOne(
+      {where: {slug: req.params.slug}}
+    );
+    await page.setTags(tags);
+    await page.setAuthor(user);
 
-    res.send(updatedPages[0])
+    res.send(page);
   } catch (error) {
     next(error)
   }
