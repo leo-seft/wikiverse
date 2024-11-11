@@ -66,7 +66,7 @@ router.put('/:slug', async (req, res, next) => {
         name: req.body.name,
         email: req.body.email
       }
-    });
+    })
 
     const [updatedRowCount, updatedPages] = await Page.update(req.body, {
       where: {
@@ -86,12 +86,12 @@ router.put('/:slug', async (req, res, next) => {
     }))
 
     const page = await Page.findOne(
-      {where: {slug: req.params.slug}}
-    );
-    await page.setTags(tags);
-    await page.setAuthor(user);
+      { where: { slug: req.params.slug } }
+    )
+    await page.setTags(tags)
+    await page.setAuthor(user)
 
-    res.send(page);
+    res.send(page)
   } catch (error) {
     next(error)
   }
