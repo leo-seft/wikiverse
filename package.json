@@ -1,6 +1,6 @@
 {
   "name": "wikiverse",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "scripts": {
     "test": "jest",
     "client-dev": "parcel public/index.html --open",
